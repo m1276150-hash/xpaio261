@@ -4,6 +4,10 @@
   command = "npm run build"
   publish = "build"
 
+[build.environment]
+    NODE_VERSION = "18"
+    NPM_FLAGS = "--legacy-peer-deps"
+
 [functions]
   # API 함수들이 들어있는 폴더 지정 (보통 'api' 또는 'netlify/functions')
   directory = "api"
