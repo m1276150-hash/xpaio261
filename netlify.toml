@@ -1,5 +1,6 @@
 [build]
   # 리액트 앱 빌드 명령과 결과물 폴더 설정
+  base = "frontend"
   command = "npm run build"
   publish = "build"
 
