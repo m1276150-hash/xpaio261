@@ -1,0 +1,20 @@
+[build]
+  # 리액트 앱 빌드 명령과 결과물 폴더 설정
+  command = "npm run build"
+  publish = "build"
+
+[functions]
+  # API 함수들이 들어있는 폴더 지정 (보통 'api' 또는 'netlify/functions')
+  directory = "api"
+
+[[redirects]]
+  # 파이 브라우저에서 새로고침 시 404 에러 방지 (리액트 라우팅 보호)
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  # 보안 및 CORS 설정을 위한 헤더 (필요시 추가)
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"

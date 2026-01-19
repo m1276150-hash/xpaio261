@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XPAIO - Pi Network App</title>
+    
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <script>
+        // 1. SDK 초기화 (샌드박스 모드 활성)
+        // 6번 단계를 통과하기 위해 sandbox: true가 반드시 필요합니다.
+        Pi.init({ version: "2.0", sandbox: true });
+
+        const scopes = ['payments', 'username'];
+        let accessToken = "";
+        let currentUser = null;
+
+        // 2. 미완료 결제 처리 (보안상 매우 중요)
+        function onIncompletePaymentFound(payment) {
+            console.log("미완료 결제 발견:", payment.identifier);
+            // 백엔드에 결제 완료 처리를 요청하는 로직
+            $.post('/payment/complete', {
+                paymentId: payment.identifier,
+                txid: payment.transaction.txid,
+                status: 'incomplete_found'
+            });
+        };
+
+        // 3. 사용자 인증 (로그인)
+        Pi.authenticate(scopes, onIncompletePaymentFound).then(function(auth) {
+            accessToken = auth.accessToken;
+            currentUser = auth.user;
+            $('#username_display').text(currentUser.username + "님 환영합니다!");
+            console.log("인증 성공:", currentUser.username);
+        }).catch(function(error) {
+            console.error("인증 실패:", error);
+        });
+
+        // 4. 결제 생성 함수 (XPAIO 아이템 구매용)
+        function createXpaiopayment(amount, itemName) {
+            const paymentData = {
+                amount: amount,
+                memo: "XPAIO: " + itemName + " 구매",
+                metadata: { itemName: itemName }
+            };
+
+            const paymentCallbacks = {
+                onReadyForServerApproval: (paymentId) => {
+                    console.log("서버 승인 대기 중:", paymentId);
+                    $.post('/payment/approve', { paymentId: paymentId });
+                },
+                onReadyForServerCompletion: (paymentId, txid) => {
+                    console.log("서버 완료 대기 중 (TXID):", txid);
+                    $.post('/payment/complete', { paymentId: paymentId, txid: txid });
+                },
+                onCancel: (paymentId) => { console.log("결제 취소됨:", paymentId); },
+                onError: (error, payment) => { console.error("결제 오류:", error); }
+            };
+
+            Pi.createPayment(paymentData, paymentCallbacks);
+        }
+    </script>
+</head>
+<body class="bg-light">
+
+    <div class="container mt-5">
+        <div class="card shadow">
+            <div class="card-body text-center">
+                <h1 class="display-4">XPAIO</h1>
+                <p id="username_display" class="lead text-primary font-weight-bold">사용자 확인 중...</p>
+                <hr>
+                <div class="my-4">
+                    <h3>게임 아이템 상점</h3>
+                    <p>테스트넷 파이(π)로 아이템을 구매해 보세요.</p>
+                    <button class="btn btn-success btn-lg mx-2" onclick="createXpaiopayment(1, '황금알')">황금알 구매 (1 Pi)</button>
+                    <button class="btn btn-warning btn-lg mx-2" onclick="createXpaiopayment(0.1, '아이템 팩')">아이템 팩 (0.1 Pi)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

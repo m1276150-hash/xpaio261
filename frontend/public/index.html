@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="XPAIO - Pi Network App" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+    <script>
+      // 데모 앱의 복잡한 변수 주입 대신, 테스트를 위해 직접 값을 설정합니다.
+      window.__ENV = {
+        // 로컬에서 실행 중인 백엔드 서버 주소
+        backendURL: "http://localhost:5000", 
+        // 6번 단계 통과를 위해 무조건 "true"로 설정
+        sandbox: "true", 
+      }
+    </script>
+
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    
+    <script>
+      (function() {
+        var isSandbox = window.__ENV.sandbox === "true";
+        console.log("XPAIO SDK 모드:", isSandbox ? "샌드박스" : "프로덕션");
+        
+        // Pi SDK 초기화
+        window.Pi.init({ version: "2.0", sandbox: isSandbox });
+      })();
+    </script>
+    
+    <title>XPAIO - Pi App</title>
+  </head>
+  <body>
+    <noscript>이 앱을 실행하려면 자바스크립트가 필요합니다.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
