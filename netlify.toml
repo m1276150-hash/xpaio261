@@ -6,7 +6,7 @@
   publish = "build"
 
 [build.environment]
-  NODE_VERSION = "18" # React 18 사용을 위해 18 버전 이상을 권장합니다.
+  NODE_VERSION = "16.20.2" # React 18 사용을 위해 18 버전 이상을 권장합니다.
   NPM_FLAGS = "--legacy-peer-deps"
 
 [functions]
