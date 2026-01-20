@@ -6,15 +6,16 @@
   publish = "build"
 
 [build.environment]
-  NODE_VERSION = "16.20.2" # React 18 사용을 위해 18 버전 이상을 권장합니다.
+  # webpack 4와의 호환성을 위해 Node 16 버전을 유지합니다.
+  NODE_VERSION = "16.20.2"
   NPM_FLAGS = "--legacy-peer-deps"
 
 [functions]
-  # API 함수들이 들어있는 폴더 지정
+  # API 함수들이 들어있는 폴더 지정 (Netlify 서버리스 함수 경로)
   directory = "api"
 
 [[redirects]]
-  # 파이 브라우저에서 새로고침 시 404 에러 방지 (리액트 라우팅 보호)
+  # 리액트 라우팅 보호: 새로고침 시 404 에러 방지
   from = "/*"
   to = "/index.html"
   status = 200
@@ -24,12 +25,15 @@
   for = "/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
-    # 파이 브라우저 내에서 앱이 정상적으로 프레임에 로드되도록 허용합니다.
-    Content-Security-Policy = "frame-ancestors 'self' https://*.pinet.com https://*.pi;"
-    # 브라우저가 특정 보안 정책을 준수하도록 강제합니다.
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    # 파이 브라우저(샌드박스 및 pinet)에서 앱이 차단되지 않도록 허용 범위를 구체화합니다.
+    Content-Security-Policy = "frame-ancestors 'self' https://sandbox.minepi.com https://*.pinet.com https://*.pi;"
+    # 특정 브라우저에서 프레임을 허용하도록 설정 (Blocked 에러 해결 핵심)
+    X-Frame-Options = "ALLOW-FROM https://sandbox.minepi.com"
     X-Content-Type-Options = "nosniff"
 
-    [[headers]]
+[[headers]]
   for = "/privacy.html"
   [headers.values]
     Content-Type = "text/html; charset=utf-8"
