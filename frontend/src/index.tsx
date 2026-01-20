@@ -1,7 +1,9 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client'; // '/client'를 반드시 추가해야 합니다.
+import * as ReactDOM from 'react-dom'; 
 import 'normalize.css'; 
 import './defaults.css'; 
+
+// shop 폴더 내부의 index.tsx (XpaioApp)를 가져옴
 import XpaioApp from './shop'; 
 
 declare global {
@@ -11,18 +13,14 @@ declare global {
   }
 }
 
-// 1. root 요소를 찾고 TypeScript 타입을 지정합니다.
-const rootElement = document.getElementById('root');
+// 1. rootElement가 확실히 존재한다고 지정 (as HTMLElement)
+const rootElement = document.getElementById('root') as HTMLElement;
 
-if (!rootElement) {
-  throw new Error('Root element not found');
-}
-
-// 2. React 18 방식의 createRoot를 사용하여 render의 밑줄을 해결합니다.
-const root = ReactDOM.createRoot(rootElement as HTMLElement);
-
-root.render(
+// 2. ReactDOM을 any로 형변환하여 render 메서드에 대한 타입 경고를 강제로 제거
+// 이 방식은 React 16 버전에서 발생하는 타입 충돌을 가장 확실하게 해결합니다.
+(ReactDOM as any).render(
   <React.StrictMode>
     <XpaioApp />
-  </React.StrictMode>
+  </React.StrictMode>,
+  rootElement
 );
