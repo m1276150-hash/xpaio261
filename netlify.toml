@@ -1,15 +1,16 @@
 [build]
   # 리액트 앱 빌드 명령과 결과물 폴더 설정
   base = "frontend"
+  # CI=false를 추가하여 사소한 경고로 인해 빌드가 중단되는 것을 방지합니다.
   command = "npm install && CI=false npm run build"
   publish = "build"
 
 [build.environment]
-    NODE_VERSION = "16"
-    NPM_FLAGS = "--legacy-peer-deps"
+  NODE_VERSION = "18" # React 18 사용을 위해 18 버전 이상을 권장합니다.
+  NPM_FLAGS = "--legacy-peer-deps"
 
 [functions]
-  # API 함수들이 들어있는 폴더 지정 (보통 'api' 또는 'netlify/functions')
+  # API 함수들이 들어있는 폴더 지정
   directory = "api"
 
 [[redirects]]
@@ -19,7 +20,21 @@
   status = 200
 
 [[headers]]
-  # 보안 및 CORS 설정을 위한 헤더 (필요시 추가)
+  # 파이 네트워크 보안 정책 및 CORS 설정
   for = "/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
+    # 파이 브라우저 내에서 앱이 정상적으로 프레임에 로드되도록 허용합니다.
+    Content-Security-Policy = "frame-ancestors 'self' https://*.pinet.com https://*.pi;"
+    # 브라우저가 특정 보안 정책을 준수하도록 강제합니다.
+    X-Content-Type-Options = "nosniff"
+
+    [[headers]]
+  for = "/privacy.html"
+  [headers.values]
+    Content-Type = "text/html; charset=utf-8"
+
+[[headers]]
+  for = "/terms.html"
+  [headers.values]
+    Content-Type = "text/html; charset=utf-8"
